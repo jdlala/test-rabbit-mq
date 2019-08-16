@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.tianjinunifiedfeexmlserver.mapper.itemAndEntEntlook.StreamMapper">
+    <insert id="insertEntInfo">
+        insert into UPPC.ENT_SENDER_INFO
+        <if test="ID != null" >
+            ID,
+        </if>
+        <if test="ENT_ID != null" >
+            ENT_ID,
+        </if>
+        <if test="SENDER_ID != null" >
+            SENDER_ID,
+        </if>
+            CREATE_DATE
+            values (#{ID,jdbcType=VARCHAR},#{ENT_ID,jdbcType=VARCHAR},#{SENDER_ID,jdbcType=VARCHAR},sysdate)
+    </insert>
+
+    <select id="isRegister" resultType="java.lang.Integer">
+        select
+        count(*)
+        from
+        UPPC.COMPANY_INFO_VIEW
+        where
+        UNISCID= #{entId}
+    </select>
+    <select id="isReCord" resultType="java.lang.Integer">
+        select
+        count(*)
+        from
+        UPPC.ENT_SENDER_INFO
+        where
+        ENT_ID= #{entId}
+        and
+        SENDER_ID= #{senderId}
+    </select>
+    <select id="isHasEntItem" resultType="java.lang.Integer">
+        select
+        count(*)
+        from
+        PM_ENT_ITEM it left join PM_ITEM_DETAIL de
+        on it.item_id = de.ITEM_ID
+        left join PM_ENT_ITEM_PRICE pr
+        on de.ID=pr.item_detail_id
+        WHERE
+        it.STATUS=1
+        and de.STATUS =1
+        and pr.STATUS = 1
+        <if test="entCode != null and entCode != '' ">
+            AND it.ENTERPRISE_ID = #{entCode}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.tianjinunifiedfeexmlserver.mapper.itemAndEntEntlook.LookMapper">
+
+    <!--费项 费项详情 resultMap-->
+    <resultMap id="PmItemFlat" type="cn.tianjin.unifiedfee.pm.stream.dto.xml.PmItemFlat">
+        <result column="itemid" property="itemId" jdbcType="VARCHAR"/>
+        <result column="itemtitle" property="itemName" jdbcType="VARCHAR"/>
+        <result column="belongs" property="belongs" jdbcType="VARCHAR"/>
+        <result column="belongsid" property="belongsId" jdbcType="VARCHAR"/>
+        <result column="detailid" property="itemDetailId" jdbcType="VARCHAR"/>
+        <result column="detailtitle" property="itemDetailName" jdbcType="VARCHAR"/>
+        <result column="pricetype" property="priceType" jdbcType="VARCHAR"/>
+        <result column="chargetype" property="chargeType" jdbcType="VARCHAR"/>
+        <result column="chargeenterprise" property="businessSubject" jdbcType="VARCHAR"/>
+        <result column="priceid" property="priceId" jdbcType="VARCHAR"/>
+        <result column="pricetitle" property="priceName" jdbcType="VARCHAR"/>
+        <result column="tradetype" property="tradeType" jdbcType="VARCHAR"/>
+        <result column="goodstype" property="goodsType" jdbcType="VARCHAR"/>
+        <result column="specifications" property="specifications" jdbcType="VARCHAR"/>
+        <result column="currency" property="currency" jdbcType="VARCHAR"/>
+        <result column="charge_unit" property="chargeUnit" jdbcType="VARCHAR"/>
+        <result column="pricelowerest" property="priceLowerest" jdbcType="DECIMAL"/>
+        <result column="pricehighest" property="priceHighest" jdbcType="DECIMAL"/>
+
+        <result column="ENTERPRISE_ID" property="entCode" jdbcType="VARCHAR"/>
+        <result column="ENTERPRISE_NAME" property="entName" jdbcType="VARCHAR"/>
+        <result column="ent_price_highest" property="entPriceHighest" jdbcType="DECIMAL"/>
+        <result column="ent_price_lowerest" property="entPriceLowerest" jdbcType="DECIMAL"/>
+    </resultMap>
+
+
+    <!--查询费项以及费项详情-->
+    <select id="selectItemAll" resultMap="PmItemFlat">
+         SELECT
+             itemid,
+             itemtitle,
+             belongsid,
+             belongs,
+             detailid,
+             detailtitle,
+             pricetype,
+             chargetype,
+             chargeenterprise,
+             priceid,
+             pricetitle,
+             specifications,
+             goodstype,
+             currency,
+             charge_unit ,
+             pricehighest,
+             pricelowerest,
+             tradetype
+         FROM
+         uppc.item_detail_price_all
+         order by itemid,detailid
+    </select>
+
+
+
+    <select id="selectEntItem" resultMap="PmItemFlat">
+        select
+        it.item_id as itemid,
+        it.item_name as itemtitle,
+        it.ENTERPRISE_ID,
+        it.ENTERPRISE_NAME,
+        de.id as detailid,
+        de.title as detailtitle,
+        de.price_type as pricetype,
+        de.charge_type as chargetype,
+        de.CHARGE_ENTERPRISE as CHARGEENTERPRISE,
+
+        pr.id as priceid,
+        pr.title as pricetitle,
+        pr.specifications,
+        pr.goods_type as goodstype,
+        pr.currency,
+        pr.charge_unit,
+        pr.price_highest as pricehighest,
+        pr.price_lowerest as pricelowerest,
+        pr.ent_price_highest,
+        pr.ent_price_lowerest,
+        pr.trade_type as tradetype
+
+        from
+        PM_ENT_ITEM it left join PM_ITEM_DETAIL de
+        on it.item_id = de.ITEM_ID
+        left join PM_ENT_ITEM_PRICE pr
+        on de.ID=pr.item_detail_id
+        WHERE
+        it.STATUS=1
+        and de.STATUS =1
+        and pr.STATUS = 1
+        <if test="entCode != null and entCode != '' ">
+            AND it.ENTERPRISE_ID = #{entCode}
+        </if>
+        order by it.ITEM_NAME ,de.TITLE ASC nulls last
+
+    </select>
+
+
+</mapper>
